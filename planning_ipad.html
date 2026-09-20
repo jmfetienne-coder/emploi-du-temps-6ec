@@ -1,0 +1,1206 @@
+<title>L'emploi du temps de Chlo&#x00E9;</title>
+<style>
+/* ---------------------------------------------------------------- jetons
+   Palette chaude : les gris tirent vers l'ocre des humanites. Un gris
+   parfaitement neutre, a cote de ces teintes-la, a l'air subi et non choisi.
+   Tout est defini ici, sur :root nu -- une couleur qui n'existerait que dans
+   le bloc " nuit " ne s'appliquerait jamais chez qui n'a rien regle. */
+:root {
+  --papier:   #F7F5F1;
+  --surface:  #FFFFFF;
+  --encre:    #23262B;
+  --gris:     #857E73;
+  --gris-pale:#A9A296;
+  --filet:    #E4E0D7;
+  --ombre:    0 1px 2px rgba(35,38,43,.05), 0 6px 18px rgba(35,38,43,.05);
+  --ombre-nette: 0 2px 6px rgba(35,38,43,.09), 0 10px 28px rgba(35,38,43,.09);
+  --semA:     #1F5E54;
+  --semB:     #6E3A63;
+  --r:        14px;
+  --nuit:     0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papier:   #141517;
+    --surface:  #212327;
+    --encre:    #EFEDE8;
+    --gris:     #9A9389;
+    --gris-pale:#6E6962;
+    --filet:    #33363B;
+    --ombre:    0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.3);
+    --ombre-nette: 0 2px 6px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.45);
+    --semA:     #4FA392;
+    --semB:     #B77BA8;
+    --nuit:     1;
+  }
+}
+:root[data-theme="dark"] {
+  --papier:   #141517;
+  --surface:  #212327;
+  --encre:    #EFEDE8;
+  --gris:     #9A9389;
+  --gris-pale:#6E6962;
+  --filet:    #33363B;
+  --ombre:    0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.3);
+  --ombre-nette: 0 2px 6px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.45);
+  --semA:     #4FA392;
+  --semB:     #B77BA8;
+  --nuit:     1;
+}
+
+/* Avenir Next est une police du systeme iOS et macOS : l'ecran de l'iPad et
+   l'affiche punaisee au mur se composent dans le meme caractere. */
+body {
+  margin: 0;
+  background: var(--papier);
+  color: var(--encre);
+  font-family: "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--encre); outline-offset: 2px; border-radius: 6px; }
+
+.enveloppe { max-width: 1120px; margin: 0 auto; padding: 0 18px 44px; }
+
+/* ------------------------------------------------------------- l'en-tete */
+.chapeau {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: color-mix(in srgb, var(--papier) 88%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--filet);
+  padding-block: 14px 12px;
+}
+.chapeau-i {
+  max-width: 1120px; margin: 0 auto; padding: 0 18px;
+  display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap;
+}
+h1 {
+  margin: 0; font-weight: 200; font-size: clamp(25px, 5.4vw, 34px);
+  letter-spacing: -.012em; line-height: 1.08; text-wrap: balance;
+}
+.qui {
+  margin: 5px 0 0; font-size: 11px; font-weight: 600;
+  letter-spacing: .13em; color: var(--gris); text-transform: uppercase;
+}
+.pilule {
+  margin-left: auto; border: 0; border-radius: 999px;
+  padding: 10px 17px; background: var(--semA); color: #fff;
+  font-weight: 600; font-size: 13px; letter-spacing: .13em;
+  display: inline-flex; align-items: center; gap: 9px;
+  box-shadow: var(--ombre);
+}
+.pilule[data-sem="B"] { background: var(--semB); }
+.pilule .permuter { opacity: .72; font-size: 15px; line-height: 1; }
+
+/* --------------------------------------------------------------- onglets */
+.onglets {
+  display: flex; gap: 4px; margin: 18px 0 4px; padding: 4px;
+  background: var(--surface); border: 1px solid var(--filet);
+  border-radius: 999px; width: fit-content; box-shadow: var(--ombre);
+}
+.onglets button {
+  border: 0; background: transparent; border-radius: 999px;
+  padding: 9px 20px; font-size: 14px; font-weight: 500; color: var(--gris);
+  transition: background .18s, color .18s;
+}
+.onglets button[aria-selected="true"] { background: var(--encre); color: var(--papier); }
+
+/* ------------------------------------------------- la barre des journees */
+.jours { display: flex; gap: 8px; margin: 16px 0 20px; overflow-x: auto;
+         padding-bottom: 4px; scrollbar-width: none; }
+.jours::-webkit-scrollbar { display: none; }
+.jour-chip {
+  flex: 0 0 auto; border: 1px solid var(--filet); background: var(--surface);
+  border-radius: var(--r); padding: 9px 15px; text-align: center;
+  min-width: 78px; transition: border-color .18s, background .18s;
+}
+.jour-chip b { display: block; font-size: 12px; font-weight: 600;
+               letter-spacing: .1em; text-transform: uppercase; }
+.jour-chip span { display: block; font-size: 11px; color: var(--gris); margin-top: 2px; }
+.jour-chip[aria-pressed="true"] { background: var(--encre); border-color: var(--encre); }
+.jour-chip[aria-pressed="true"] b,
+.jour-chip[aria-pressed="true"] span { color: var(--papier); }
+.jour-chip.aujourdhui:not([aria-pressed="true"]) { border-color: var(--encre); }
+
+/* ------------------------------------------------------ la journee, en liste */
+.titre-jour { display: flex; align-items: baseline; gap: 12px;
+              margin: 0 0 14px; flex-wrap: wrap; }
+.titre-jour h2 { margin: 0; font-size: 21px; font-weight: 500; letter-spacing: -.01em; }
+.titre-jour .compte { font-size: 13px; color: var(--gris); }
+
+.annonce {
+  display: flex; align-items: center; gap: 13px; margin-bottom: 16px;
+  padding: 14px 16px; border-radius: var(--r); background: var(--surface);
+  border: 1px solid var(--filet); box-shadow: var(--ombre);
+}
+.annonce .pastille { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.annonce .txt { font-size: 14px; }
+.annonce .txt b { font-weight: 600; }
+.annonce .quand { display: block; font-size: 12px; color: var(--gris); margin-top: 1px; }
+
+.liste { display: flex; flex-direction: column; gap: 9px; }
+.creneau { display: grid; grid-template-columns: 62px 1fr; gap: 13px; align-items: stretch; }
+.heure { text-align: right; padding-top: 12px; font-variant-numeric: tabular-nums; }
+.heure b { display: block; font-size: 15px; font-weight: 500; }
+.heure span { display: block; font-size: 11px; color: var(--gris-pale); margin-top: 1px; }
+
+.cours {
+  position: relative; border-radius: var(--r); padding: 13px 15px 13px 19px;
+  background: var(--fond); overflow: hidden; box-shadow: var(--ombre);
+}
+.cours::before { content: ""; position: absolute; inset: 0 auto 0 0;
+                 width: 5px; background: var(--teinte); }
+.cours h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--teinte);
+            letter-spacing: -.005em; }
+.cours .detail { margin: 3px 0 0; font-size: 13px; color: var(--gris); }
+.cours .detail .sep { opacity: .45; padding: 0 4px; }
+.cours.autre-groupe { opacity: .46; }
+.cours.passe { opacity: .5; }
+.cours.maintenant { box-shadow: var(--ombre-nette); outline: 2px solid var(--teinte); }
+.cours .maintenant-tag {
+  display: inline-block; margin-top: 8px; padding: 3px 9px; border-radius: 999px;
+  background: var(--teinte); color: #fff; font-size: 10px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.cours .lettre {
+  position: absolute; top: 11px; right: 12px; width: 19px; height: 19px;
+  border-radius: 6px; background: var(--teinte); color: #fff;
+  font-size: 11px; font-weight: 600; display: grid; place-items: center;
+}
+.repas {
+  grid-column: 2; border-radius: var(--r); background: var(--filet);
+  color: var(--gris); font-size: 11px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; padding: 9px 15px;
+}
+.vide { grid-column: 2; border-radius: var(--r); border: 1px dashed var(--filet);
+        color: var(--gris-pale); font-size: 13px; padding: 12px 15px; }
+
+/* ----------------------------------------------------- la semaine, en grille */
+.cadre { overflow-x: auto; -webkit-overflow-scrolling: touch;
+         border-radius: var(--r); }
+.grille { display: grid; gap: 5px; min-width: 760px;
+          grid-template-columns: 52px repeat(5, 1fr); }
+.gr-jour { font-size: 11px; font-weight: 600; letter-spacing: .12em;
+           text-transform: uppercase; text-align: center; padding: 4px 0 8px;
+           border-bottom: 1px solid var(--filet); margin-bottom: 3px; }
+.gr-jour.aujourdhui { color: var(--encre); }
+.gr-jour:not(.aujourdhui) { color: var(--gris); }
+.gr-heure { font-size: 11px; color: var(--gris); text-align: right;
+            padding: 8px 8px 0 0; font-variant-numeric: tabular-nums; }
+.gr-heure b { display: block; font-size: 13px; font-weight: 500; color: var(--encre); }
+.gr-case { position: relative; border-radius: 9px; background: var(--fond);
+           padding: 7px 8px 7px 12px; overflow: hidden; min-height: 50px; }
+.gr-case::before { content: ""; position: absolute; inset: 0 auto 0 0;
+                   width: 4px; background: var(--teinte); }
+.gr-case b { display: block; font-size: 12px; font-weight: 600; color: var(--teinte);
+             line-height: 1.2; }
+.gr-case span { display: block; font-size: 10px; color: var(--gris); margin-top: 2px; }
+/* Le separateur est un span, et " .gr-case span { display:block } " le
+   passait a la ligne : " E26 " puis un point tout seul, puis " Groupe 1 ".
+   Il faut une selectivite superieure pour le ramener en ligne. */
+.gr-case .sep { display: inline; margin: 0; opacity: .45; padding: 0 3px; }
+.gr-case .lettre { position: absolute; top: 5px; right: 5px; width: 15px; height: 15px;
+                   border-radius: 4px; background: var(--teinte); color: #fff;
+                   font-size: 9px; font-weight: 600; display: grid; place-items: center; }
+.gr-case.autre-groupe { opacity: .5; }
+.gr-vide { border-radius: 9px; background: var(--filet); opacity: .35; }
+.gr-repas { grid-column: 1 / -1; border-radius: 9px; background: var(--filet);
+            color: var(--gris); font-size: 10px; font-weight: 600;
+            letter-spacing: .14em; text-transform: uppercase; text-align: center;
+            padding: 5px; }
+.paire { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.empile { display: grid; gap: 3px; }
+
+/* ------------------------------------------------------------- la legende */
+.pied { margin-top: 34px; border-top: 1px solid var(--filet); padding-top: 22px; }
+.pied h4 { margin: 0 0 16px; font-size: 11px; font-weight: 600; letter-spacing: .14em;
+           text-transform: uppercase; color: var(--gris); }
+.familles { display: grid; gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.famille h5 { margin: 0 0 9px; font-size: 10px; font-weight: 600; letter-spacing: .14em;
+              text-transform: uppercase; color: var(--gris-pale); }
+.famille ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.famille li { display: flex; align-items: center; gap: 9px; font-size: 13px; }
+.puce { width: 26px; height: 15px; border-radius: 5px; background: var(--fond);
+        position: relative; flex: 0 0 auto; }
+.puce::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px;
+                border-radius: 5px 0 0 5px; background: var(--teinte); }
+
+/* ------------------------------------------------------------- les reglages */
+.reglages { margin-top: 26px; display: grid; gap: 14px; }
+.reglage { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+           font-size: 13px; color: var(--gris); }
+.reglage .choix { display: flex; gap: 4px; padding: 3px; border-radius: 999px;
+                  background: var(--surface); border: 1px solid var(--filet); }
+.reglage .choix button { border: 0; background: transparent; border-radius: 999px;
+                         padding: 6px 14px; font-size: 13px; color: var(--gris); }
+.reglage .choix button[aria-pressed="true"] { background: var(--encre); color: var(--papier); }
+.source { margin-top: 24px; font-size: 11px; color: var(--gris-pale); line-height: 1.6; }
+
+@media (max-width: 560px) {
+  .creneau { grid-template-columns: 52px 1fr; gap: 10px; }
+  .enveloppe, .chapeau-i { padding-inline: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+
+<header class="chapeau">
+  <div class="chapeau-i">
+    <div>
+      <h1>Emploi du temps</h1>
+      <p class="qui" id="qui"></p>
+    </div>
+    <button class="pilule" id="pilule" type="button" aria-live="polite">
+      <span id="pilule-txt">SEMAINE A</span><span class="permuter" aria-hidden="true">&#8646;</span>
+    </button>
+  </div>
+</header>
+
+<div class="enveloppe">
+  <div class="onglets" role="tablist">
+    <button role="tab" id="t-jour" data-vue="jour" aria-selected="true">Ma journ&#x00E9;e</button>
+    <button role="tab" id="t-semaine" data-vue="semaine" aria-selected="false">Ma semaine</button>
+  </div>
+
+  <section id="vue-jour" role="tabpanel" aria-labelledby="t-jour">
+    <div class="jours" id="jours"></div>
+    <div class="titre-jour"><h2 id="titre-jour"></h2><span class="compte" id="compte"></span></div>
+    <div id="annonce"></div>
+    <div class="liste" id="liste"></div>
+  </section>
+
+  <section id="vue-semaine" role="tabpanel" aria-labelledby="t-semaine" hidden>
+    <div class="cadre"><div class="grille" id="grille"></div></div>
+  </section>
+
+  <div class="pied">
+    <h4>Les couleurs des mati&#x00E8;res</h4>
+    <div class="familles" id="familles"></div>
+    <div class="reglages">
+      <div class="reglage">
+        <span>Le groupe de Chlo&#x00E9;&nbsp;:</span>
+        <div class="choix" id="choix-groupe">
+          <button type="button" data-gr="Groupe 1">Groupe&nbsp;1</button>
+          <button type="button" data-gr="Groupe 2">Groupe&nbsp;2</button>
+          <button type="button" data-gr="">Les deux</button>
+        </div>
+      </div>
+      <div class="reglage" id="reglage-ancre"></div>
+    </div>
+    <p class="source" id="source"></p>
+  </div>
+</div>
+
+<script>
+const DONNEES = {
+ "annee": "2026-2027",
+ "classe": "6\u1d49 C",
+ "creneaux": [
+  {
+   "debut": "8h30",
+   "fin": "9h30",
+   "max": 570,
+   "min": 510,
+   "repas": false
+  },
+  {
+   "debut": "9h30",
+   "fin": "10h30",
+   "max": 630,
+   "min": 570,
+   "repas": false
+  },
+  {
+   "debut": "10h30",
+   "fin": "11h30",
+   "max": 690,
+   "min": 630,
+   "repas": false
+  },
+  {
+   "debut": "11h30",
+   "fin": "12h30",
+   "max": 750,
+   "min": 690,
+   "repas": false
+  },
+  {
+   "debut": "12h30",
+   "fin": "13h30",
+   "max": 810,
+   "min": 750,
+   "repas": true
+  },
+  {
+   "debut": "13h30",
+   "fin": "14h30",
+   "max": 870,
+   "min": 810,
+   "repas": false
+  },
+  {
+   "debut": "14h30",
+   "fin": "15h30",
+   "max": 930,
+   "min": 870,
+   "repas": false
+  },
+  {
+   "debut": "15h30",
+   "fin": "16h30",
+   "max": 990,
+   "min": 930,
+   "repas": false
+  },
+  {
+   "debut": "16h30",
+   "fin": "17h30",
+   "max": 1050,
+   "min": 990,
+   "repas": false
+  }
+ ],
+ "eleve": "Chlo\u00e9 \u00c9tienne",
+ "etablissement": "Coll\u00e8ge Pastre-Grande Bastide",
+ "familles": [
+  "Langues",
+  "Sciences",
+  "Humanit\u00e9s",
+  "Arts et sport",
+  "Vie scolaire"
+ ],
+ "jours": [
+  "lundi",
+  "mardi",
+  "mercredi",
+  "jeudi",
+  "vendredi"
+ ],
+ "matieres": {
+  "ANGLAIS": {
+   "clair": "#E9E6F5",
+   "clairNuit": "#2D2B3F",
+   "famille": "Langues",
+   "fort": "#5B4B9E",
+   "fortNuit": "#A9A0CF",
+   "nom": "Anglais"
+  },
+  "ARTS": {
+   "clair": "#F7E1EB",
+   "clairNuit": "#3C2635",
+   "famille": "Arts et sport",
+   "fort": "#A8336B",
+   "fortNuit": "#DB95B6",
+   "nom": "Arts plastiques"
+  },
+  "CDI": {
+   "clair": "#EEE8E1",
+   "clairNuit": "#302E2E",
+   "famille": "Vie scolaire",
+   "fort": "#6E5B48",
+   "fortNuit": "#C5B8AA",
+   "nom": "CDI"
+  },
+  "DEVOIRS": {
+   "clair": "#EBE9E5",
+   "clairNuit": "#303032",
+   "famille": "Vie scolaire",
+   "fort": "#6B665E",
+   "fortNuit": "#BCB9B3",
+   "nom": "Devoirs faits"
+  },
+  "EMC": {
+   "clair": "#F3EDD3",
+   "clairNuit": "#343123",
+   "famille": "Humanit\u00e9s",
+   "fort": "#7F6712",
+   "fortNuit": "#E9D386",
+   "nom": "EMC"
+  },
+  "EPS": {
+   "clair": "#EBEFD8",
+   "clairNuit": "#2D3126",
+   "famille": "Arts et sport",
+   "fort": "#5C6B22",
+   "fortNuit": "#CCDA96",
+   "nom": "EPS"
+  },
+  "FRANCAIS": {
+   "clair": "#E4ECF5",
+   "clairNuit": "#242E3C",
+   "famille": "Langues",
+   "fort": "#2F5C8F",
+   "fortNuit": "#96B6D9",
+   "nom": "Fran\u00e7ais"
+  },
+  "HIST": {
+   "clair": "#F8E9D4",
+   "clairNuit": "#392E23",
+   "famille": "Humanit\u00e9s",
+   "fort": "#975B13",
+   "fortNuit": "#EBBC85",
+   "nom": "Histoire-G\u00e9o"
+  },
+  "MATHS": {
+   "clair": "#F7E4E1",
+   "clairNuit": "#3E2828",
+   "famille": "Sciences",
+   "fort": "#B23A2E",
+   "fortNuit": "#DE9891",
+   "nom": "Maths"
+  },
+  "MUSIQUE": {
+   "clair": "#F0E5F3",
+   "clairNuit": "#332B3A",
+   "famille": "Arts et sport",
+   "fort": "#7A4B86",
+   "fortNuit": "#C3A5CA",
+   "nom": "Musique"
+  },
+  "PASTORALE": {
+   "clair": "#E5EAEF",
+   "clairNuit": "#2A2F36",
+   "famille": "Vie scolaire",
+   "fort": "#4E5F73",
+   "fortNuit": "#ABB7C4",
+   "nom": "Pastorale"
+  },
+  "PHYSIQUE": {
+   "clair": "#DCEFEC",
+   "clairNuit": "#1F3335",
+   "famille": "Sciences",
+   "fort": "#17726F",
+   "fortNuit": "#8CE3E0",
+   "nom": "Physique-Chimie"
+  },
+  "SVT": {
+   "clair": "#E3F0DF",
+   "clairNuit": "#26332B",
+   "famille": "Sciences",
+   "fort": "#3C7539",
+   "fortNuit": "#A3CEA1",
+   "nom": "SVT"
+  },
+  "VIECLASSE": {
+   "clair": "#EDEBE8",
+   "clairNuit": "#303132",
+   "famille": "Vie scolaire",
+   "fort": "#6C6760",
+   "fortNuit": "#BBB8B4",
+   "nom": "Vie de classe"
+  }
+ },
+ "semaine": {
+  "jeudi": {
+   "10h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "SVT",
+     "prof": "Criado",
+     "salle": "E26",
+     "sem": "A"
+    },
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "ANGLAIS",
+     "prof": "Cuesta Roe",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ],
+   "11h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "HIST",
+     "prof": "Halimi",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "13h30": [
+    {
+     "duree": 2,
+     "gr": null,
+     "m": "EPS",
+     "prof": "Jullien",
+     "salle": "EPS2",
+     "sem": "AB"
+    }
+   ],
+   "15h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "ANGLAIS",
+     "prof": "Cuesta Roe",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ],
+   "16h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "DEVOIRS",
+     "prof": "Cuesta Roe",
+     "salle": "\u2014",
+     "sem": "B"
+    }
+   ],
+   "8h30": [
+    {
+     "duree": 2,
+     "gr": null,
+     "m": "FRANCAIS",
+     "prof": "Dubois",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ]
+  },
+  "lundi": {
+   "10h30": [
+    {
+     "duree": 1,
+     "gr": "Groupe 1",
+     "m": "FRANCAIS",
+     "prof": "Dubois",
+     "salle": "E26",
+     "sem": "AB"
+    },
+    {
+     "duree": 1,
+     "gr": "Groupe 2",
+     "m": "MATHS",
+     "prof": "Spriet",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "11h30": [
+    {
+     "duree": 1,
+     "gr": "Groupe 1",
+     "m": "MATHS",
+     "prof": "Spriet",
+     "salle": "E26",
+     "sem": "AB"
+    },
+    {
+     "duree": 1,
+     "gr": "Groupe 2",
+     "m": "FRANCAIS",
+     "prof": "Dubois",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "13h30": [
+    {
+     "duree": 2,
+     "gr": null,
+     "m": "EPS",
+     "prof": "Jullien",
+     "salle": "EPS2",
+     "sem": "AB"
+    }
+   ],
+   "15h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "MUSIQUE",
+     "prof": "Faure",
+     "salle": "E25",
+     "sem": "AB"
+    }
+   ],
+   "8h30": [
+    {
+     "duree": 1,
+     "gr": "Groupe 1",
+     "m": "CDI",
+     "prof": "Chassaigne",
+     "salle": "CDI",
+     "sem": "B"
+    },
+    {
+     "duree": 1,
+     "gr": "Groupe 2",
+     "m": "SVT",
+     "prof": "Criado",
+     "salle": "Labo",
+     "sem": "B"
+    }
+   ],
+   "9h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "ANGLAIS",
+     "prof": "Cuesta Roe",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ]
+  },
+  "mardi": {
+   "10h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "ARTS",
+     "prof": "Adjeroud",
+     "salle": "E26",
+     "sem": "A"
+    },
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "MATHS",
+     "prof": "Spriet",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ],
+   "11h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "FRANCAIS",
+     "prof": "Dubois",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "13h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "ANGLAIS",
+     "prof": "Cuesta Roe",
+     "salle": "E26",
+     "sem": "A"
+    },
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "ARTS",
+     "prof": "Adjeroud",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ],
+   "14h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "MATHS",
+     "prof": "Spriet",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "15h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "PHYSIQUE",
+     "prof": "Guipert",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "16h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "DEVOIRS",
+     "prof": "Mathurin",
+     "salle": "\u2014",
+     "sem": "A"
+    }
+   ],
+   "8h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "HIST",
+     "prof": "Halimi",
+     "salle": "E26",
+     "sem": "A"
+    },
+    {
+     "duree": 1,
+     "gr": "Groupe 1",
+     "m": "SVT",
+     "prof": "Criado",
+     "salle": "Labo",
+     "sem": "B"
+    },
+    {
+     "duree": 1,
+     "gr": "Groupe 2",
+     "m": "CDI",
+     "prof": "Chassaigne",
+     "salle": "CDI",
+     "sem": "B"
+    }
+   ],
+   "9h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "MATHS",
+     "prof": "Spriet",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ]
+  },
+  "mercredi": {
+   "10h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "PASTORALE",
+     "prof": "Aps, Rios",
+     "salle": "E26",
+     "sem": "A"
+    },
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "ANGLAIS",
+     "prof": "Cuesta Roe",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ],
+   "11h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "MATHS",
+     "prof": "Spriet",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ],
+   "8h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "MATHS",
+     "prof": "Spriet",
+     "salle": "E26",
+     "sem": "A"
+    },
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "PASTORALE",
+     "prof": "Aps, Rios",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ],
+   "9h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "PHYSIQUE",
+     "prof": "Guipert",
+     "salle": "E26",
+     "sem": "A"
+    },
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "MATHS",
+     "prof": "Spriet",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ]
+  },
+  "vendredi": {
+   "10h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "ANGLAIS",
+     "prof": "Cuesta Roe",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "11h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "HIST",
+     "prof": "Halimi",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "13h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "FRANCAIS",
+     "prof": "Dubois",
+     "salle": "E26",
+     "sem": "AB"
+    }
+   ],
+   "14h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "SVT",
+     "prof": "Criado",
+     "salle": "E26",
+     "sem": "A"
+    },
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "VIECLASSE",
+     "prof": "Dubois",
+     "salle": "E26",
+     "sem": "B"
+    }
+   ],
+   "9h30": [
+    {
+     "duree": 1,
+     "gr": null,
+     "m": "EMC",
+     "prof": "Halimi",
+     "salle": "E26",
+     "sem": "A"
+    }
+   ]
+  }
+ },
+ "source": "PLANNING_CHLOE_ETIENNE_6EC.pdf, \u00e9dition du 28/08/2026"
+};
+
+/* ====================================================================
+   L'ETAT. Trois reglages, gardes dans le navigateur de l'iPad : la
+   semaine en cours, le groupe de Chloe, le jour regarde. Rien ne part
+   ailleurs, et la page s'ouvre exactement comme on l'a laissee.
+
+   localStorage peut lever (navigation privee, donnees de site bloquees).
+   Tout passe donc par un try/catch, et la page se dessine correctement
+   meme quand rien ne peut etre ni lu ni ecrit.
+   ==================================================================== */
+const CLE = "planning-chloe-6ec";
+function lire() {
+  try { return JSON.parse(localStorage.getItem(CLE) || "{}") || {}; }
+  catch (e) { return {}; }
+}
+function ecrire(o) {
+  try { localStorage.setItem(CLE, JSON.stringify(o)); } catch (e) { /* tant pis */ }
+}
+let etat = lire();
+
+/* La semaine ISO : c'est elle qui fait tourner A et B.
+   On retient une seule fois \u00AB telle semaine etait une A \u00BB, et la parite
+   des semaines ISO donne toutes les autres \u2014 passees comme a venir. */
+function semaineISO(d) {
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  const jan1 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return Math.round(((t - jan1) / 86400000 + 1) / 7);
+}
+function numeroAbsolu(d) {
+  /* Un numero qui ne repart pas a 1 au nouvel an : sinon la parite se
+     casserait au 31 decembre, et l'application se tromperait de semaine
+     pile au retour des vacances de Noel. */
+  return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())
+                     - Date.UTC(2020, 0, 6)) / 604800000);
+}
+function semaineDe(d) {
+  if (!etat.ancre) return etat.semaine || "A";
+  const ecart = numeroAbsolu(d) - etat.ancre.n;
+  const pair = ((ecart % 2) + 2) % 2 === 0;
+  return pair ? etat.ancre.lettre : (etat.ancre.lettre === "A" ? "B" : "A");
+}
+
+const MAINTENANT = () => new Date();
+
+/* LA DATE DE REFERENCE, qui n'est pas toujours aujourd'hui.
+   Le samedi et le dimanche, l'eleve ne cherche pas la semaine qui s'acheve
+   mais celle qui commence : la reference bascule alors sur le lundi qui
+   vient. Sans cela, l'application ouvrirait le dimanche soir sur le lundi
+   d'il y a six jours \u2014 et sur la mauvaise lettre une semaine sur deux. */
+function reference() {
+  const d = MAINTENANT();
+  const j = d.getDay();
+  if (j === 0) d.setDate(d.getDate() + 1);        /* dimanche -> lundi */
+  else if (j === 6) d.setDate(d.getDate() + 2);   /* samedi  -> lundi */
+  return d;
+}
+const NOMS_JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi",
+                    "vendredi", "samedi"];
+const MOIS = ["janvier", "f\u00E9vrier", "mars", "avril", "mai", "juin", "juillet",
+              "ao\u00FBt", "septembre", "octobre", "novembre", "d\u00E9cembre"];
+
+function dateDuJour(nomJour, ref) {
+  /* La date de ce jour-la dans la semaine de `ref` (lundi premier). */
+  const i = DONNEES.jours.indexOf(nomJour);
+  const d = new Date(ref);
+  const decalage = (d.getDay() === 0 ? -6 : 1 - d.getDay());
+  d.setDate(d.getDate() + decalage + i);
+  return d;
+}
+
+/* Le jour ouvre sur aujourd'hui \u2014 c'est toute la raison d'etre de
+   l'application. Le week-end, sur le lundi qui vient. */
+function jourDepart() {
+  const j = NOMS_JOURS[MAINTENANT().getDay()];
+  return DONNEES.jours.includes(j) ? j : "lundi";
+}
+let jourVu = jourDepart();
+let semaineVue = semaineDe(reference());
+let vue = "jour";
+
+/* ==================================================================== */
+function teintes(cle) {
+  const m = DONNEES.matieres[cle];
+  const nuit = getComputedStyle(document.documentElement)
+                 .getPropertyValue("--nuit").trim() === "1";
+  return { teinte: nuit ? m.fortNuit : m.fort,
+           fond: nuit ? m.clairNuit : m.clair, nom: m.nom };
+}
+function coursDe(jour, heure, lettre) {
+  const l = (DONNEES.semaine[jour] || {})[heure] || [];
+  return l.filter(c => c.sem.includes(lettre));
+}
+function estSien(c) {
+  return !c.gr || !etat.groupe || c.gr === etat.groupe;
+}
+function detail(c, court) {
+  const bouts = [];
+  if (c.salle && c.salle !== "\u2014") bouts.push(c.salle);
+  if (c.gr) bouts.push(c.gr);
+  if (!court) bouts.push(c.prof);
+  return bouts.join('<span class="sep">\u00B7</span>');
+}
+
+/* ------------------------------------------------------------ la journee */
+function dessinerJours() {
+  const ref = reference();
+  const auj = NOMS_JOURS[MAINTENANT().getDay()];
+  document.getElementById("jours").innerHTML = DONNEES.jours.map(j => {
+    const d = dateDuJour(j, ref);
+    return `<button type="button" class="jour-chip${j === auj ? " aujourdhui" : ""}"
+      data-jour="${j}" aria-pressed="${j === jourVu}">
+      <b>${j.slice(0, 3)}</b><span>${d.getDate()} ${MOIS[d.getMonth()].slice(0, 4)}</span>
+    </button>`;
+  }).join("");
+}
+
+function dessinerJournee() {
+  const ref = reference();
+  const d = dateDuJour(jourVu, ref);
+  // Le vrai jour, et non la reference : `reference()` vaut lundi des le
+  // samedi, et \u00AB en ce moment \u00BB se serait declenche pendant le week-end.
+  const estAuj = NOMS_JOURS[MAINTENANT().getDay()] === jourVu;
+  document.getElementById("titre-jour").textContent =
+    jourVu[0].toUpperCase() + jourVu.slice(1) + " " + d.getDate() + " " + MOIS[d.getMonth()];
+
+  const mnt = estAuj ? ref.getHours() * 60 + ref.getMinutes() : -1;
+  let heures = 0, courant = null, suivant = null;
+  const morceaux = [];
+
+  DONNEES.creneaux.forEach(cr => {
+    if (cr.repas) {
+      morceaux.push(`<div class="creneau"><div class="heure"></div>
+        <div class="repas">Pause d\u00E9jeuner</div></div>`);
+      return;
+    }
+    const liste = coursDe(jourVu, cr.debut, semaineVue);
+    const enCours = mnt >= cr.min && mnt < cr.max;
+    let cases;
+    if (!liste.length) {
+      cases = `<div class="vide">Pas de cours</div>`;
+    } else {
+      heures += Math.max(...liste.map(c => c.duree));
+      cases = liste.map(c => {
+        const t = teintes(c.m);
+        const sien = estSien(c);
+        if (sien && enCours && !courant) courant = { c, cr, t };
+        if (sien && mnt >= 0 && cr.min > mnt && !suivant) suivant = { c, cr, t };
+        const cl = ["cours"];
+        if (!sien) cl.push("autre-groupe");
+        if (mnt >= 0 && cr.max <= mnt) cl.push("passe");
+        if (sien && enCours) cl.push("maintenant");
+        const duree = c.duree > 1
+          ? `<span class="sep">\u00B7</span>${c.duree}\u00a0h` : "";
+        return `<div class="${cl.join(" ")}" style="--teinte:${t.teinte};--fond:${t.fond}">
+          <h3>${t.nom}</h3>
+          <p class="detail">${detail(c, false)}${duree}</p>
+          ${sien && enCours ? '<span class="maintenant-tag">en ce moment</span>' : ""}
+        </div>`;
+      }).join("");
+      if (liste.length > 1) cases = `<div class="empile">${cases}</div>`;
+    }
+    morceaux.push(`<div class="creneau">
+      <div class="heure"><b>${cr.debut}</b><span>${cr.fin}</span></div>
+      <div>${cases}</div></div>`);
+  });
+
+  document.getElementById("liste").innerHTML = morceaux.join("");
+  document.getElementById("compte").textContent =
+    heures ? heures + (heures > 1 ? " heures de cours" : " heure de cours")
+           : "pas de cours";
+
+  /* L'annonce : ce qui se passe maintenant, ou ce qui vient. C'est la
+     seule chose qu'un enfant regarde entre deux sonneries. */
+  const zone = document.getElementById("annonce");
+  const quoi = courant || suivant;
+  if (!estAuj || !quoi) { zone.innerHTML = ""; return; }
+  const reste = courant ? quoi.cr.max - mnt : quoi.cr.min - mnt;
+  const quand = courant
+    ? `en cours, jusqu'\u00E0 ${quoi.cr.fin}`
+    : (reste <= 60 ? `dans ${reste} minute${reste > 1 ? "s" : ""}, \u00E0 ${quoi.cr.debut}`
+                   : `\u00E0 ${quoi.cr.debut}`);
+  zone.innerHTML = `<div class="annonce">
+    <span class="pastille" style="background:${quoi.t.teinte}"></span>
+    <span class="txt"><b>${courant ? "" : "Ensuite : "}${quoi.t.nom}</b>
+    ${detail(quoi.c, true) ? `<span class="sep">\u00B7</span>${detail(quoi.c, true)}` : ""}
+    <span class="quand">${quand}</span></span></div>`;
+}
+
+/* ------------------------------------------------------------- la semaine */
+function dessinerSemaine() {
+  const auj = NOMS_JOURS[MAINTENANT().getDay()];   // le vrai jour, pas la reference
+  const out = [`<div></div>`];
+  DONNEES.jours.forEach(j => out.push(
+    `<div class="gr-jour${j === auj ? " aujourdhui" : ""}">${j}</div>`));
+
+  const occupe = {};
+  DONNEES.creneaux.forEach((cr, i) => {
+    if (cr.repas) { out.push(`<div class="gr-repas">Pause d\u00E9jeuner</div>`); return; }
+    out.push(`<div class="gr-heure"><b>${cr.debut}</b>${cr.fin}</div>`);
+    DONNEES.jours.forEach(j => {
+      if (occupe[j + i]) { out.push(""); return; }
+      const liste = coursDe(j, cr.debut, semaineVue);
+      if (!liste.length) { out.push(`<div class="gr-vide"></div>`); return; }
+      const duree = Math.max(...liste.map(c => c.duree));
+      if (duree > 1) occupe[j + (i + 1)] = true;
+      const cases = liste.map(c => {
+        const t = teintes(c.m);
+        const cl = "gr-case" + (estSien(c) ? "" : " autre-groupe");
+        const lettre = c.sem.length === 1
+          ? `<span class="lettre">${c.sem}</span>` : "";
+        return `<div class="${cl}" style="--teinte:${t.teinte};--fond:${t.fond}">
+          ${lettre}<b>${t.nom}</b><span>${detail(c, true)}</span></div>`;
+      }).join("");
+      out.push(liste.length > 1
+        ? `<div class="paire">${cases}</div>`
+        : `<div style="display:grid;grid-row:span ${duree}">${cases}</div>`);
+    });
+  });
+  document.getElementById("grille").innerHTML = out.join("");
+}
+
+/* ------------------------------------------------------------- la legende */
+function dessinerLegende() {
+  document.getElementById("familles").innerHTML = DONNEES.familles.map(f => {
+    const membres = Object.keys(DONNEES.matieres)
+      .filter(k => DONNEES.matieres[k].famille === f);
+    return `<div class="famille"><h5>${f}</h5><ul>` + membres.map(k => {
+      const t = teintes(k);
+      return `<li><span class="puce" style="--teinte:${t.teinte};--fond:${t.fond}"></span>
+        ${t.nom}</li>`;
+    }).join("") + `</ul></div>`;
+  }).join("");
+}
+
+function dessinerReglages() {
+  document.querySelectorAll("#choix-groupe button").forEach(b =>
+    b.setAttribute("aria-pressed", (etat.groupe || "") === b.dataset.gr));
+  const d = reference();
+  document.getElementById("reglage-ancre").innerHTML = etat.ancre
+    ? `<span>Cette semaine est une <b>semaine ${semaineDe(d)}</b>, et
+       l'application suit toute seule.</span>
+       <div class="choix"><button type="button" data-ancre="">Corriger</button></div>`
+    : `<span>Quelle semaine est-ce, en ce moment&nbsp;?</span>
+       <div class="choix">
+         <button type="button" data-ancre="A">Semaine A</button>
+         <button type="button" data-ancre="B">Semaine B</button>
+       </div>`;
+}
+
+/* ==================================================================== */
+function tout() {
+  document.getElementById("pilule-txt").textContent = "SEMAINE " + semaineVue;
+  document.getElementById("pilule").dataset.sem = semaineVue;
+  dessinerJours();
+  if (vue === "jour") dessinerJournee(); else dessinerSemaine();
+  dessinerLegende();
+  dessinerReglages();
+}
+
+document.addEventListener("click", e => {
+  const chip = e.target.closest(".jour-chip");
+  if (chip) { jourVu = chip.dataset.jour; tout(); return; }
+
+  const onglet = e.target.closest(".onglets button");
+  if (onglet) {
+    vue = onglet.dataset.vue;
+    document.querySelectorAll(".onglets button").forEach(b =>
+      b.setAttribute("aria-selected", b.dataset.vue === vue));
+    document.getElementById("vue-jour").hidden = vue !== "jour";
+    document.getElementById("vue-semaine").hidden = vue === "jour";
+    tout();
+    return;
+  }
+
+  if (e.target.closest("#pilule")) {
+    semaineVue = semaineVue === "A" ? "B" : "A";
+    etat.semaine = semaineVue; ecrire(etat); tout(); return;
+  }
+
+  const gr = e.target.closest("#choix-groupe button");
+  if (gr) { etat.groupe = gr.dataset.gr; ecrire(etat); tout(); return; }
+
+  const ancre = e.target.closest("[data-ancre]");
+  if (ancre) {
+    const v = ancre.dataset.ancre;
+    etat.ancre = v ? { n: numeroAbsolu(MAINTENANT()), lettre: v } : null;
+    if (v) semaineVue = v;
+    ecrire(etat); tout();
+  }
+});
+
+/* La page reste ouverte des jours sur un iPad pos\u00E9 sur un bureau : sans
+   cela, \u00AB en ce moment \u00BB d\u00E9signerait le cours d'avant-hier. */
+setInterval(() => { if (vue === "jour") dessinerJournee(); }, 60000);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) { jourVu = jourDepart(); semaineVue = semaineDe(reference()); tout(); }
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", tout);
+
+document.getElementById("qui").textContent =
+  DONNEES.eleve + " \u00B7 " + DONNEES.classe + " \u00B7 " + DONNEES.annee;
+document.getElementById("source").textContent =
+  DONNEES.etablissement + " \u00B7 Source : " + DONNEES.source;
+tout();
+</script>

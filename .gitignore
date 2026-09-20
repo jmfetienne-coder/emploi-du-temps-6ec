@@ -1,0 +1,18 @@
+# Restes de compilation LaTeX
+*.aux
+*.log
+*.out
+__pycache__/
+
+# Les .tex sont ENGENDRÉS par generer_planning.py : les versionner, c'est
+# versionner deux fois la même chose, et risquer qu'ils se contredisent.
+# Les PDF, eux, restent : ce sont les affiches à imprimer.
+PLANNING_SEMAINE_A.tex
+PLANNING_SEMAINE_B.tex
+PLANNING_A_ET_B.tex
+
+# Le planning officiel du collège. C'est le document de l'établissement, et
+# non le nôtre : il reste sur la machine, il ne part pas sur GitHub. Il
+# n'est d'ailleurs pas nécessaire pour reconstruire quoi que ce soit — tout
+# ce qu'il contient a été transcrit dans donnees_planning.py.
+PLANNING_CHLOE_ETIENNE_6EC.pdf
