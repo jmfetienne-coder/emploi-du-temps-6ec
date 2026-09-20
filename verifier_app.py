@@ -173,6 +173,28 @@ for cle, m in sorted(J.get("matieres", {}).items()):
         verifier("app : %s se lit %s (contraste %.1f:1, seuil %.1f)"
                  % (m["nom"], quand, r, SEUIL), r >= SEUIL, True)
 
+# ------------------------------------------------------- 4 bis. les demi-groupes
+# L'INVARIANT DONT DÉPEND LE FILTRAGE. Depuis que l'application n'affiche
+# que le groupe de Chloé, un créneau partagé doit porter un cours pour
+# CHAQUE groupe : s'il n'en portait qu'un, l'élève de l'autre groupe verrait
+# « Pas de cours » — ce qui serait peut-être vrai, mais mérite qu'on aille
+# vérifier auprès du collège plutôt que de l'apprendre le jour même.
+#
+# Rien dans les données n'impose cette symétrie ; c'est un fait du planning,
+# et c'est pourquoi il est épinglé ici plutôt que supposé.
+GROUPES = ("Groupe 1", "Groupe 2")
+for (jour, heure), liste in sorted(D.SEMAINE.items()):
+    for lettre in "AB":
+        ce_jour = [c for c in liste if lettre in c["semaines"]]
+        avec = [c for c in ce_jour if c["groupe"]]
+        if not avec:
+            continue
+        verifier("app : %s %s semaine %s, un cours pour chaque demi-groupe"
+                 % (jour, heure, lettre),
+                 sorted(c["groupe"] for c in avec), list(GROUPES))
+        verifier("app : %s %s semaine %s, le créneau est entièrement partagé"
+                 % (jour, heure, lettre), len(avec), len(ce_jour))
+
 # --------------------------------------------------------------- 5. horaires
 cr = J.get("creneaux", [])
 verifier("app : autant de créneaux que dans les données", len(cr), len(D.CRENEAUX))

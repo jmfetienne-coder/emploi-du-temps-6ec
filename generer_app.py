@@ -416,7 +416,6 @@ h1 {
             letter-spacing: -.005em; }
 .cours .detail { margin: 3px 0 0; font-size: 13px; color: var(--gris); }
 .cours .detail .sep { opacity: .45; padding: 0 4px; }
-.cours.autre-groupe { opacity: .46; }
 .cours.passe { opacity: .5; }
 .cours.maintenant { box-shadow: var(--ombre-nette); outline: 2px solid var(--teinte); }
 .cours .maintenant-tag {
@@ -464,7 +463,6 @@ h1 {
 .gr-case .lettre { position: absolute; top: 5px; right: 5px; width: 15px; height: 15px;
                    border-radius: 4px; background: var(--teinte); color: #fff;
                    font-size: 9px; font-weight: 600; display: grid; place-items: center; }
-.gr-case.autre-groupe { opacity: .5; }
 .gr-vide { border-radius: 9px; background: var(--filet); opacity: .35; }
 .gr-repas { grid-column: 1 / -1; border-radius: 9px; background: var(--filet);
             color: var(--gris); font-size: 10px; font-weight: 600;
@@ -650,8 +648,16 @@ function coursDe(jour, heure, lettre) {
   const l = (DONNEES.semaine[jour] || {})[heure] || [];
   return l.filter(c => c.sem.includes(lettre));
 }
-function estSien(c) {
-  return !c.gr || !etat.groupe || c.gr === etat.groupe;
+function siens(liste) {
+  /* Les cours que Chloe suit reellement sur ce creneau.
+     Tant que son groupe n'est pas renseigne, on montre les deux : on ne
+     peut pas choisir a sa place. Une fois renseigne, l'autre groupe
+     DISPARAIT — l'estomper laissait deux cases a lire la ou il n'y a qu'un
+     cours, et c'est exactement ce qu'on demandait a la grille d'eviter.
+     Si son groupe n'a rien sur ce creneau, la liste sort vide, et le
+     creneau s'affiche libre : c'est la verite. */
+  if (!etat.groupe) return liste;
+  return liste.filter(c => !c.gr || c.gr === etat.groupe);
 }
 function detail(c, court) {
   const bouts = [];
@@ -693,7 +699,7 @@ function dessinerJournee() {
         <div class="repas">Pause déjeuner</div></div>`);
       return;
     }
-    const liste = coursDe(jourVu, cr.debut, semaineVue);
+    const liste = siens(coursDe(jourVu, cr.debut, semaineVue));
     const enCours = mnt >= cr.min && mnt < cr.max;
     let cases;
     if (!liste.length) {
@@ -702,19 +708,17 @@ function dessinerJournee() {
       heures += Math.max(...liste.map(c => c.duree));
       cases = liste.map(c => {
         const t = teintes(c.m);
-        const sien = estSien(c);
-        if (sien && enCours && !courant) courant = { c, cr, t };
-        if (sien && mnt >= 0 && cr.min > mnt && !suivant) suivant = { c, cr, t };
+        if (enCours && !courant) courant = { c, cr, t };
+        if (mnt >= 0 && cr.min > mnt && !suivant) suivant = { c, cr, t };
         const cl = ["cours"];
-        if (!sien) cl.push("autre-groupe");
         if (mnt >= 0 && cr.max <= mnt) cl.push("passe");
-        if (sien && enCours) cl.push("maintenant");
+        if (enCours) cl.push("maintenant");
         const duree = c.duree > 1
           ? `<span class="sep">·</span>${c.duree}\\u00a0h` : "";
         return `<div class="${cl.join(" ")}" style="--teinte:${t.teinte};--fond:${t.fond}">
           <h3>${t.nom}</h3>
           <p class="detail">${detail(c, false)}${duree}</p>
-          ${sien && enCours ? '<span class="maintenant-tag">en ce moment</span>' : ""}
+          ${enCours ? '<span class="maintenant-tag">en ce moment</span>' : ""}
         </div>`;
       }).join("");
       if (liste.length > 1) cases = `<div class="empile">${cases}</div>`;
@@ -759,13 +763,13 @@ function dessinerSemaine() {
     out.push(`<div class="gr-heure"><b>${cr.debut}</b>${cr.fin}</div>`);
     DONNEES.jours.forEach(j => {
       if (occupe[j + i]) { out.push(""); return; }
-      const liste = coursDe(j, cr.debut, semaineVue);
+      const liste = siens(coursDe(j, cr.debut, semaineVue));
       if (!liste.length) { out.push(`<div class="gr-vide"></div>`); return; }
       const duree = Math.max(...liste.map(c => c.duree));
       if (duree > 1) occupe[j + (i + 1)] = true;
       const cases = liste.map(c => {
         const t = teintes(c.m);
-        const cl = "gr-case" + (estSien(c) ? "" : " autre-groupe");
+        const cl = "gr-case";
         const lettre = c.sem.length === 1
           ? `<span class="lettre">${c.sem}</span>` : "";
         return `<div class="${cl}" style="--teinte:${t.teinte};--fond:${t.fond}">

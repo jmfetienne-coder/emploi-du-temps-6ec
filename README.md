@@ -52,9 +52,10 @@ Elle fait quatre choses que le papier ne peut pas faire.
    cours ; elle retient la parité de la semaine et se débrouille ensuite
    toute seule, y compris après les vacances. La pastille en haut à droite
    permet de basculer à la main.
-4. **Elle connaît le groupe de Chloé.** Les cours en demi-groupe restent
-   tous les deux affichés — rien n'est caché — mais le sien est net et
-   l'autre s'estompe.
+4. **Elle connaît le groupe de Chloé.** Une fois son groupe renseigné,
+   **l'autre groupe disparaît** : elle ne lit plus qu'un cours là où
+   l'affiche en montre deux. Tant que le groupe n'est pas renseigné, les
+   deux restent affichés — on ne choisit pas à sa place.
 
 Deux vues : **Ma journée** (la liste des cours, avec les horaires) et **Ma
 semaine** (la grille des cinq jours). Le thème clair et le thème sombre sont
@@ -130,7 +131,8 @@ Le reste des conventions :
 - **Un cours de deux heures occupe une seule grande case**, et non deux
   petites. Le français du jeudi matin est un bloc, pas deux cours.
 - **Quand la classe se partage en deux groupes**, la case se partage aussi,
-  avec « Groupe 1 » et « Groupe 2 ». Chloé n'en suit qu'un.
+  avec « Groupe 1 » et « Groupe 2 ». Chloé n'en suit qu'un — et sur
+  l'application, où l'on peut dire lequel, l'autre ne s'affiche pas.
 - **La légende ne liste que les matières présentes sur cette feuille-là.**
   Sur la feuille de la semaine A, pas de CDI : il n'y en a pas cette
   semaine-là, et une couleur qu'on chercherait en vain n'apprend rien.
@@ -219,7 +221,7 @@ lecture humaine. **Si le collège publie une version corrigée, c'est
 `donnees_planning.py` qu'il faut reprendre**, à l'œil, comme la première
 fois.
 
-**Tout le reste se vérifie : 752 contrôles**, 512 pour le papier, 198 pour
+**Tout le reste se vérifie : 764 contrôles**, 512 pour le papier, 210 pour
 l'écran et 42 pour ce README.
 
 ### Le papier — `verifier_planning.py`, 512 contrôles
@@ -248,7 +250,7 @@ tient le registre de ce qu'il pose (`POSEES`, `VIDES`) et le harnais suit ce
 registre : deux calculs de la même géométrie seraient deux copies, et une
 copie finit par diverger de l'autre sans prévenir.
 
-### L'écran — `verifier_app.py`, 198 contrôles
+### L'écran — `verifier_app.py`, 210 contrôles
 
 La page dessine sa grille dans le navigateur, à partir d'un bloc JSON que le
 générateur y dépose. Le harnais vérifie ce bloc et la palette, c'est-à-dire
@@ -265,13 +267,18 @@ tout ce dont la page se sert pour dessiner :
 4. **La lisibilité** — le contraste de chaque nom de matière sur son fond
    est **mesuré**, de jour comme de nuit, et doit valoir au moins 4,5:1,
    le seuil des WCAG pour du texte courant.
-5. **Les horaires** — la pause déjeuner n'est pas saisie : elle se déduit
+5. **Les demi-groupes** — un créneau partagé porte bien un cours pour
+   **chaque** groupe. C'est l'invariant dont dépend le filtrage : s'il n'en
+   portait qu'un, l'élève de l'autre groupe verrait « Pas de cours ». Rien
+   dans les données n'impose cette symétrie — c'est un fait du planning, et
+   c'est pourquoi il est épinglé plutôt que supposé.
+6. **Les horaires** — la pause déjeuner n'est pas saisie : elle se déduit
    de ce qui l'entoure, et le harnais vérifie qu'elle tombe juste.
-6. **L'autonomie** — le site n'appelle **aucune** ressource extérieure :
+7. **L'autonomie** — le site n'appelle **aucune** ressource extérieure :
    ni police, ni script, ni feuille de style. C'est ce qui le rend
    consultable hors connexion, et ce qui garantit qu'aucun tiers ne voit
    passer les horaires d'une enfant.
-7. **L'encodage** — la page ne porte aucun caractère non-ASCII, et ses
+8. **L'encodage** — la page ne porte aucun caractère non-ASCII, et ses
    accents reviennent bien une fois les échappements résolus. Voir
    l'incident ci-dessous : c'est le contrôle qui interdit au mojibake de
    revenir.
