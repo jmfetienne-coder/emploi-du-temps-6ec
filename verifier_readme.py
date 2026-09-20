@@ -120,10 +120,31 @@ for h in HARNAIS:
                  int(re.sub(r"\D", "", cite.group(1))), n)
 
 # ------------------------------------------------------------ 2. les chemins
+def ecarte_du_depot():
+    """Les fichiers que `.gitignore` tient hors du dépôt."""
+    chemin = os.path.join(ICI, ".gitignore")
+    if not os.path.exists(chemin):
+        return set()
+    return {l.strip() for l in open(chemin, encoding="utf-8")
+            if l.strip() and not l.startswith("#")}
+
+
+IGNORES = ecarte_du_depot()
+
 for chemin in sorted(set(re.findall(
         r"`([A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:py|pdf|tex|html|md|yml|json))`", R))):
-    verifier("readme : le chemin `%s` existe" % chemin,
-             os.path.exists(os.path.join(ICI, chemin)), True)
+    # Tous les chemins cités ne sont pas des promesses d'existence. Le
+    # README dit que `PLANNING_CHLOE_ETIENNE_6EC.pdf` n'est PAS versionné —
+    # c'est le document du collège. Exiger sa présence faisait échouer la
+    # chaîne GitHub, qui travaille sur un dépôt fraîchement cloné où il est
+    # absent, et à bon droit. Pour ces fichiers-là, l'affirmation à relire
+    # n'est pas « il existe » mais « il est tenu hors du dépôt ».
+    if chemin in IGNORES:
+        verifier("readme : le chemin `%s` est bien tenu hors du dépôt" % chemin,
+                 chemin in IGNORES, True)
+    else:
+        verifier("readme : le chemin `%s` existe" % chemin,
+                 os.path.exists(os.path.join(ICI, chemin)), True)
 
 # ------------------------------------------------------------ 3. les adresses
 def joignable(url):

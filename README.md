@@ -297,7 +297,10 @@ Ce harnais relit donc les affirmations vérifiables de ce fichier :
    Le total est calculé comme une somme, et non écrit à côté des autres :
    c'est par là qu'un README se met à se contredire lui-même.
 2. **Les chemins entre dos-d'âne**, cherchés sur le disque. Un chemin cité
-   est une affirmation d'existence.
+   est une affirmation d'existence — sauf pour les fichiers que
+   `.gitignore` tient hors du dépôt, où l'affirmation à relire n'est pas
+   « il existe » mais « il en est bien écarté ». Confondre les deux faisait
+   échouer la chaîne GitHub, qui travaille sur un clone frais.
 3. **Les adresses**, interrogées. Deux sont déclarées non testables, et le
    sont nommément : `localhost`, qui n'est pas un service publié, et
    l'artefact Claude, qui exige une authentification. L'exemption est
