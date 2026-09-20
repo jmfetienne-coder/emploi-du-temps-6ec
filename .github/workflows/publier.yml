@@ -1,0 +1,60 @@
+# Publie docs/ sur GitHub Pages — et ne le publie QUE si les contrôles passent.
+#
+# Deux raisons d'avoir ce fichier plutôt que de cocher Pages à la main :
+#
+# 1. `configure-pages` avec `enablement: true` active Pages tout seul, avec le
+#    jeton du dépôt. Personne n'a à donner d'accès à personne.
+# 2. Surtout : `verifier_app.py` tourne AVANT le déploiement. Il réengendre la
+#    page et la compare à celle du dépôt, relit les données contre
+#    donnees_planning.py, et mesure le contraste des quatorze matières. Un
+#    fichier retouché à la main, ou un emploi du temps corrigé sans
+#    réengendrer, n'atteint pas le site — il fait échouer la construction.
+#
+# Le harnais des PDF (verifier_planning.py) n'est pas ici : il demande
+# lualatex et PyMuPDF, et les affiches ne sont pas ce que ce site sert.
+
+name: Publier le planning
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  controler:
+    name: Les 198 contrôles de la page
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Vérifier que docs/index.html dit ce que disent les données
+        run: python3 verifier_app.py
+
+  publier:
+    name: Déployer sur Pages
+    needs: controler
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: deploiement
+        uses: actions/deploy-pages@v4
