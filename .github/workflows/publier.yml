@@ -29,15 +29,21 @@ concurrency:
 
 jobs:
   controler:
-    name: Les 198 contrôles de la page
+    name: Les 752 contrôles
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Vérifier que docs/index.html dit ce que disent les données
+      - name: Installer PyMuPDF, qui sert à relire les PDF
+        run: python3 -m pip install --quiet pymupdf
+      - name: La page dit-elle ce que disent les données ?
         run: python3 verifier_app.py
+      - name: Les PDF composent-ils ce que disent les données ?
+        run: python3 verifier_planning.py
+      - name: Le README dit-il encore la vérité ?
+        run: python3 verifier_readme.py
 
   publier:
     name: Déployer sur Pages

@@ -72,16 +72,15 @@ Le fichier servi, `docs/index.html`, est **exactement la page de
 l'artefact** et non une copie : le harnais vérifie qu'il enveloppe le même
 contenu, si bien que les deux adresses ne peuvent pas se contredire.
 
-**Le dépôt refuse de publier une page qui ne tient pas ses promesses.** À
-chaque `push`, GitHub relance `verifier_app.py` **avant** le déploiement :
-il réengendre la page, la compare à celle du dépôt, relit les données
-contre `donnees_planning.py` et mesure le contraste des quatorze matières.
-Une retouche à la main dans le HTML, ou un emploi du temps corrigé sans
-réengendrer, casse la construction et n'atteint jamais l'iPad.
+**Le dépôt refuse de publier ce qui ne tient pas ses promesses.** À chaque
+`push`, GitHub relance **les trois harnais avant le déploiement** — la
+page, les PDF et ce README. Une retouche à la main dans le HTML, un emploi
+du temps corrigé sans réengendrer, une adresse morte dans ce fichier : la
+construction casse, et l'iPad de Chloé continue d'afficher la version
+d'avant.
 
-Le harnais des PDF n'est pas dans cette chaîne : il demande lualatex et
-PyMuPDF, et les affiches ne sont pas ce que ce site sert. Il reste à lancer
-à la main avant de valider.
+`verifier_planning.py` y tourne sans LaTeX : il ne **compile** rien, il
+ouvre les trois PDF versionnés. PyMuPDF suffit.
 
 Ce qui **n'est pas** publié, et pourquoi :
 
@@ -175,9 +174,10 @@ PLANNING/
 ├── verifier_planning.py             ouvre les PDF et vérifie ce qui y est composé
 ├── generer_app.py                   engendre la page de l'iPad, dans ses deux formes
 ├── verifier_app.py                  vérifie les données, la palette et les contrastes
+├── verifier_readme.py               relit les affirmations de ce fichier-ci
 ├── planning_ipad.html               l'application, au format attendu par l'artefact
 ├── docs/index.html                  la MÊME page, autonome : le site GitHub Pages
-├── .github/workflows/publier.yml    contrôle la page, puis la publie sur Pages
+├── .github/workflows/publier.yml    lance les trois harnais, puis publie sur Pages
 ├── PLANNING_SEMAINE_A.pdf / .tex
 ├── PLANNING_SEMAINE_B.pdf / .tex
 └── PLANNING_A_ET_B.pdf  / .tex
@@ -219,8 +219,8 @@ lecture humaine. **Si le collège publie une version corrigée, c'est
 `donnees_planning.py` qu'il faut reprendre**, à l'œil, comme la première
 fois.
 
-**Tout le reste se vérifie : 710 contrôles**, 512 pour le papier et 198 pour
-l'écran.
+**Tout le reste se vérifie : 752 contrôles**, 512 pour le papier, 198 pour
+l'écran et 42 pour ce README.
 
 ### Le papier — `verifier_planning.py`, 512 contrôles
 
@@ -281,6 +281,51 @@ pour regarder le rendu. Cette vérification-là a été faite à l'écran, en
 clair et en sombre, et elle est à refaire à chaque changement d'allure.
 `verifier_planning.py` est plus exigeant parce qu'il le peut : un PDF se
 relit sans navigateur.
+
+### Le README lui-même — `verifier_readme.py`, 42 contrôles
+
+Un README vieillit plus vite que ce qu'il décrit. Ses compteurs restent à
+leur valeur de la veille, ses chemins survivent aux fichiers qu'ils
+nomment, ses adresses cessent de répondre — et le lecteur suivant fait
+confiance sans que rien ne le détrompe. C'est la règle des valeurs
+imprimées, appliquée à la prose : **une affirmation qu'aucun programme ne
+relit finit par être fausse.**
+
+Ce harnais relit donc les affirmations vérifiables de ce fichier :
+
+1. **Les compteurs**, obtenus en relançant chaque harnais — jamais recopiés.
+   Le total est calculé comme une somme, et non écrit à côté des autres :
+   c'est par là qu'un README se met à se contredire lui-même.
+2. **Les chemins entre dos-d'âne**, cherchés sur le disque. Un chemin cité
+   est une affirmation d'existence.
+3. **Les adresses**, interrogées. Deux sont déclarées non testables, et le
+   sont nommément : `localhost`, qui n'est pas un service publié, et
+   l'artefact Claude, qui exige une authentification. L'exemption est
+   écrite dans le harnais, pas devinée à l'exécution — une exception
+   silencieuse passerait pour un succès.
+4. **Le format des trois PDF**, obtenu en les ouvrant.
+5. **Les chiffres tirés des données** : les heures par semaine, le nombre
+   de matières.
+6. **Le contraste le plus faible**, remesuré sur les quatorze matières.
+7. **Son propre compteur.** Un harnais qui vérifie les compteurs des autres
+   et pas le sien serait la seule affirmation de ce fichier que personne ne
+   relit.
+
+Ce qu'il ne relit **pas** : la section « Les incidents » ci-dessous. Elle
+raconte des états passés — « Histoire-Géo tombait à 3,6:1 » — et ces
+nombres ne décrivent plus rien. Les tenir pour des affirmations présentes
+obligerait à réécrire le récit pour satisfaire le harnais, c'est-à-dire à
+le falsifier.
+
+```bash
+python3 verifier_readme.py
+```
+
+L'option `--sans-reseau` laisse les adresses de côté. Elle ne les **saute**
+pas : elle pose le contrôle en disant qu'il n'a pas été vérifié, et le
+nombre de contrôles ne change pas d'un mode à l'autre. Sans quoi ce
+harnais, qui compte les siens, se serait mis en échec tout seul — c'est
+arrivé, et c'est ce qui a fait écrire cette ligne.
 
 ### Les contrôles ont été mis à l'épreuve
 
