@@ -176,7 +176,8 @@ PLANNING/
 ├── verifier_planning.py             ouvre les PDF et vérifie ce qui y est composé
 ├── generer_app.py                   engendre la page de l'iPad, dans ses deux formes
 ├── verifier_app.py                  vérifie les données, la palette et les contrastes
-├── verifier_readme.py               relit les affirmations de ce fichier-ci
+├── verifier_readme.py               relit les affirmations du README et du PROMPT
+├── PROMPT-planning.md               comment étendre ce projet sans le casser
 ├── planning_ipad.html               l'application, au format attendu par l'artefact
 ├── docs/index.html                  la MÊME page, autonome : le site GitHub Pages
 ├── .github/workflows/publier.yml    lance les trois harnais, puis publie sur Pages
@@ -221,8 +222,8 @@ lecture humaine. **Si le collège publie une version corrigée, c'est
 `donnees_planning.py` qu'il faut reprendre**, à l'œil, comme la première
 fois.
 
-**Tout le reste se vérifie : 764 contrôles**, 512 pour le papier, 210 pour
-l'écran et 42 pour ce README.
+**Tout le reste se vérifie : 768 contrôles**, 512 pour le papier, 210 pour
+l'écran et 46 pour ce README.
 
 ### Le papier — `verifier_planning.py`, 512 contrôles
 
@@ -289,7 +290,7 @@ clair et en sombre, et elle est à refaire à chaque changement d'allure.
 `verifier_planning.py` est plus exigeant parce qu'il le peut : un PDF se
 relit sans navigateur.
 
-### Le README lui-même — `verifier_readme.py`, 42 contrôles
+### Le README et le PROMPT — `verifier_readme.py`, 46 contrôles
 
 Un README vieillit plus vite que ce qu'il décrit. Ses compteurs restent à
 leur valeur de la veille, ses chemins survivent aux fichiers qu'ils
@@ -298,7 +299,14 @@ confiance sans que rien ne le détrompe. C'est la règle des valeurs
 imprimées, appliquée à la prose : **une affirmation qu'aucun programme ne
 relit finit par être fausse.**
 
-Ce harnais relit donc les affirmations vérifiables de ce fichier :
+Il relit **deux** fichiers : ce README, qui dit ce que le projet est, et
+`PROMPT-planning.md`, qui dit comment on l'étend. Les chemins et les
+adresses sont vérifiés dans les deux ; les compteurs et les chiffres ne
+vivent que dans ce README, et c'est délibéré — une valeur écrite à deux
+endroits est une valeur qui va diverger. Un contrôle refuse d'ailleurs
+qu'un compteur apparaisse dans le PROMPT.
+
+Les affirmations relues :
 
 1. **Les compteurs**, obtenus en relançant chaque harnais — jamais recopiés.
    Le total est calculé comme une somme, et non écrit à côté des autres :

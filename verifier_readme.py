@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Le README dit-il encore la vérité ?
+"""Le README et le PROMPT disent-ils encore la vérité ?
 
 Un README vieillit plus vite que ce qu'il décrit. Ses compteurs restent à
 leur valeur de la veille, ses chemins survivent aux fichiers qu'ils nomment,
@@ -9,7 +9,13 @@ que rien ne le détrompe. C'est la même règle que pour les valeurs imprimées
 sur les affiches, appliquée à la prose : **une affirmation qu'aucun
 programme ne relit finit par être fausse.**
 
-Ce harnais relit donc chaque affirmation vérifiable du README :
+Deux fichiers sont relus : `README.md`, qui dit ce que le projet est, et
+`PROMPT-planning.md`, qui dit comment on l'étend. Les chemins et les
+adresses sont vérifiés dans les deux ; les compteurs et les chiffres ne
+vivent que dans le README, et c'est délibéré — une valeur écrite à deux
+endroits est une valeur qui va diverger.
+
+Ce harnais relit donc chaque affirmation vérifiable :
 
 1. **Les compteurs par harnais.** « `verifier_app.py`, 198 contrôles » n'est
    pas une phrase, c'est une mesure : on relance le harnais et on lit son
@@ -43,6 +49,7 @@ import urllib.request
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 README = os.path.join(ICI, "README.md")
+PROMPT = os.path.join(ICI, "PROMPT-planning.md")
 
 # Ces adresses ne peuvent pas être interrogées, et la raison est écrite ici
 # plutôt que devinée à l'exécution : une exception silencieuse passerait pour
@@ -98,8 +105,12 @@ def plat(texte):
 
 
 R = lire()
+P = open(PROMPT, encoding="utf-8").read() if os.path.exists(PROMPT) else ""
 HORS_RECIT = sans_incidents(R)
 PLAT = plat(HORS_RECIT)
+# Les chemins et les adresses se cherchent dans les DEUX fichiers, une fois
+# chacun : un même chemin cité des deux côtés reste une seule affirmation.
+LES_DEUX = R + "\n" + P
 total_mesure = 0
 HARNAIS = ["verifier_planning.py", "verifier_app.py"]
 
@@ -132,7 +143,8 @@ def ecarte_du_depot():
 IGNORES = ecarte_du_depot()
 
 for chemin in sorted(set(re.findall(
-        r"`([A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:py|pdf|tex|html|md|yml|json))`", R))):
+        r"`([A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:py|pdf|tex|html|md|yml|json))`",
+        LES_DEUX))):
     # Tous les chemins cités ne sont pas des promesses d'existence. Le
     # README dit que `PLANNING_CHLOE_ETIENNE_6EC.pdf` n'est PAS versionné —
     # c'est le document du collège. Exiger sa présence faisait échouer la
@@ -146,6 +158,13 @@ for chemin in sorted(set(re.findall(
         verifier("readme : le chemin `%s` existe" % chemin,
                  os.path.exists(os.path.join(ICI, chemin)), True)
 
+verifier("readme : le PROMPT existe et porte son mode d'emploi",
+         bool(P) and "## 6. Étendre" in P, True)
+# Les compteurs ne vivent QUE dans le README. Les voir apparaître dans le
+# PROMPT voudrait dire qu'ils y ont été recopiés, donc qu'ils vont diverger.
+verifier("readme : le PROMPT ne recopie aucun compteur de contrôles",
+         re.findall(r"\d+ contrôles", P), [])
+
 # ------------------------------------------------------------ 3. les adresses
 def joignable(url):
     try:
@@ -158,7 +177,7 @@ def joignable(url):
 
 
 sans_reseau = "--sans-reseau" in sys.argv
-for url in sorted(set(re.findall(r"https?://[^\s>)*`]+", R))):
+for url in sorted(set(re.findall(r"https?://[^\s>)*`]+", LES_DEUX))):
     motif = next((v for k, v in INTESTABLES.items() if k in url), None)
     if motif:
         # On ne saute pas en silence : l'exemption est nommée, et c'est

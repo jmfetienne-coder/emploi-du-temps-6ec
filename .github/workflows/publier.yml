@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   controler:
-    name: Les 764 contrôles
+    name: Les 768 contrôles
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
