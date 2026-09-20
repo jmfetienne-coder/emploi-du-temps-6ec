@@ -17,6 +17,19 @@ Conventions
 `semaines` vaut "AB" quand le cours a lieu les deux semaines, "A" ou "B"
 sinon. Un créneau peut porter deux cours différents selon la semaine, ou
 deux cours en même temps pour les deux demi-groupes (Gr1 et Gr2).
+
+UN CRÉNEAU, UNE HEURE. Le planning du collège fusionne les cases quand la
+même matière occupe deux heures de suite : l'EPS du lundi et du jeudi, le
+français du jeudi matin y sont des cases hautes. Ici, **on les écrit en
+deux cours d'une heure**. C'est la règle du projet, et elle vaut pour tout
+ce qu'on ajoutera.
+
+Deux raisons. L'heure est l'unité que l'élève manipule — elle regarde sa
+montre, pas la durée du bloc ; et chaque ligne de la grille porte alors son
+propre libellé, au lieu d'une case vide sous une case haute qu'il faut
+relier des yeux. Le champ `duree` reste dans le modèle au cas où le collège
+imposerait un jour un vrai bloc indivisible ; `verifier_planning.py` refuse
+qu'on s'en serve sans l'avoir décidé.
 """
 
 # --------------------------------------------------------------------------
@@ -119,7 +132,8 @@ SEMAINE = {
         cours("MATHS", "Spriet", "E26", "AB", "Groupe 1"),
         cours("FRANCAIS", "Dubois", "E26", "AB", "Groupe 2"),
     ],
-    ("lundi", "13h30"): [cours("EPS", "Jullien", "EPS2", "AB", None, 2)],
+    ("lundi", "13h30"): [cours("EPS", "Jullien", "EPS2")],
+    ("lundi", "14h30"): [cours("EPS", "Jullien", "EPS2")],
     ("lundi", "15h30"): [cours("MUSIQUE", "Faure", "E25")],
 
     # ------------------------------------------------------------- mardi
@@ -158,13 +172,15 @@ SEMAINE = {
     ("mercredi", "11h30"): [cours("MATHS", "Spriet", "E26", "B")],
 
     # ------------------------------------------------------------- jeudi
-    ("jeudi", "8h30"): [cours("FRANCAIS", "Dubois", "E26", "AB", None, 2)],
+    ("jeudi", "8h30"): [cours("FRANCAIS", "Dubois")],
+    ("jeudi", "9h30"): [cours("FRANCAIS", "Dubois")],
     ("jeudi", "10h30"): [
         cours("SVT", "Criado", "E26", "A"),
         cours("ANGLAIS", "Cuesta Roe", "E26", "B"),
     ],
     ("jeudi", "11h30"): [cours("HIST", "Halimi")],
-    ("jeudi", "13h30"): [cours("EPS", "Jullien", "EPS2", "AB", None, 2)],
+    ("jeudi", "13h30"): [cours("EPS", "Jullien", "EPS2")],
+    ("jeudi", "14h30"): [cours("EPS", "Jullien", "EPS2")],
     ("jeudi", "15h30"): [cours("ANGLAIS", "Cuesta Roe", "E26", "B")],
     ("jeudi", "16h30"): [cours("DEVOIRS", "Cuesta Roe", "—", "B")],
 

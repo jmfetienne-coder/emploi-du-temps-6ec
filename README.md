@@ -128,8 +128,13 @@ Le reste des conventions :
 - **L'heure de début est en gros**, l'heure de fin en petit dessous. C'est
   l'heure de début qu'on cherche quand on regarde sa montre.
 - **Une bande grise en travers** marque la pause déjeuner.
-- **Un cours de deux heures occupe une seule grande case**, et non deux
-  petites. Le français du jeudi matin est un bloc, pas deux cours.
+- **Un créneau, une heure.** Le planning du collège fusionne les cases
+  quand la même matière occupe deux heures de suite — l'EPS du lundi et du
+  jeudi, le français du jeudi matin y sont des cases hautes. Ici, ce sont
+  **deux cours d'une heure**, l'un sous l'autre. L'heure est l'unité que
+  l'élève manipule : elle regarde sa montre, pas la durée du bloc ; et
+  chaque ligne porte alors son propre libellé, au lieu d'une case vide sous
+  une case haute qu'il faut relier des yeux.
 - **Quand la classe se partage en deux groupes**, la case se partage aussi,
   avec « Groupe 1 » et « Groupe 2 ». Chloé n'en suit qu'un — et sur
   l'application, où l'on peut dire lequel, l'autre ne s'affiche pas.
@@ -222,15 +227,15 @@ lecture humaine. **Si le collège publie une version corrigée, c'est
 `donnees_planning.py` qu'il faut reprendre**, à l'œil, comme la première
 fois.
 
-**Tout le reste se vérifie : 768 contrôles**, 512 pour le papier, 210 pour
+**Tout le reste se vérifie : 864 contrôles**, 602 pour le papier, 216 pour
 l'écran et 46 pour ce README.
 
-### Le papier — `verifier_planning.py`, 512 contrôles
+### Le papier — `verifier_planning.py`, 602 contrôles
 
 Composer trois feuilles depuis une même source ne garantit rien par
 soi-même : une case peut se poser hors de son créneau, un cours de la
-semaine B se glisser dans la feuille A, un bloc de deux heures n'en couvrir
-qu'une — et LaTeX ne dira rien, puisqu'il compose aussi volontiers au
+semaine B se glisser dans la feuille A, une case s'étendre sur deux lignes
+au lieu d'une — et LaTeX ne dira rien, puisqu'il compose aussi volontiers au
 mauvais endroit qu'au bon.
 
 Le harnais ouvre donc les trois PDF **aux coordonnées où le générateur dit
@@ -238,8 +243,13 @@ avoir posé ses cases**, et lit ce qui s'y trouve :
 
 1. **Le format** — une page, A4 paysage, bandeau de semaine composé.
 2. **Ce qui doit être là** — chaque cours se retrouve dans son rectangle,
-   avec sa salle, son groupe, son professeur, sa lettre de semaine, et un
-   bloc de deux heures couvre bien deux lignes.
+   avec sa salle, son groupe, son professeur, sa lettre de semaine, et
+   chaque case tient sur exactement une ligne.
+   S'y ajoute **la règle du projet, épinglée** : aucun cours ne dure plus
+   d'une heure, et deux heures de suite de la même matière s'écrivent en
+   deux cours. Le champ `duree` reste dans le modèle pour le jour où un
+   vrai bloc indivisible s'imposerait ; le contrôle interdit qu'on s'en
+   serve sans l'avoir décidé.
 3. **Ce qui ne doit pas y être** — les créneaux libres de la semaine sont
    vides. C'est ce contrôle qui prendrait un cours de la semaine B composé
    sur la feuille A.
@@ -251,7 +261,7 @@ tient le registre de ce qu'il pose (`POSEES`, `VIDES`) et le harnais suit ce
 registre : deux calculs de la même géométrie seraient deux copies, et une
 copie finit par diverger de l'autre sans prévenir.
 
-### L'écran — `verifier_app.py`, 210 contrôles
+### L'écran — `verifier_app.py`, 216 contrôles
 
 La page dessine sa grille dans le navigateur, à partir d'un bloc JSON que le
 générateur y dépose. Le harnais vérifie ce bloc et la palette, c'est-à-dire

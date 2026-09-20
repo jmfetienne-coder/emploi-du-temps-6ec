@@ -159,6 +159,40 @@ for nom, lettre, badge, montrer_ab in G.SORTIES:
                  % (nom, "titre" if famille in familles_vues else "tait", famille),
                  serre(famille.upper()) in serre(pied), famille in familles_vues)
 
+# --------------------------------------------- 4 bis. un créneau, une heure
+# LA RÈGLE DU PROJET, ÉPINGLÉE. Le planning du collège fusionne les cases
+# quand la même matière occupe deux heures de suite ; ici on les écrit en
+# deux cours d'une heure. L'heure est l'unité que l'élève manipule, et
+# chaque ligne de la grille porte alors son propre libellé au lieu d'une
+# case vide sous une case haute.
+#
+# Le champ `duree` reste dans le modèle pour le jour où un vrai bloc
+# indivisible s'imposerait. Ce contrôle interdit qu'on s'en serve sans
+# l'avoir décidé : il faudra le modifier sciemment, et non le contourner.
+for (jour, heure), liste in sorted(D.SEMAINE.items()):
+    for c in liste:
+        verifier("règle : %s %s, %s tient sur une heure"
+                 % (jour, heure, c["matiere"]), c["duree"], 1)
+
+# Et le corollaire : deux heures de suite de la même matière sont DEUX
+# cours. Le contrôle le constate là où c'est le cas — si l'un des deux
+# disparaissait au profit d'un bloc, la ligne suivante deviendrait vide.
+HEURES = [h for h, _ in D.CRENEAUX if h != "REPAS"]
+suites = []
+for jour in D.JOURS:
+    for i in range(len(HEURES) - 1):
+        for lettre in "AB":
+            ici = {c["matiere"] for c in D.pour_semaine(lettre).get((jour, HEURES[i]), [])
+                   if not c["groupe"]}
+            apres = {c["matiere"] for c in D.pour_semaine(lettre).get((jour, HEURES[i + 1]), [])
+                     if not c["groupe"]}
+            for m in sorted(ici & apres):
+                suites.append((jour, HEURES[i], HEURES[i + 1], m, lettre))
+for jour, a, b, m, lettre in suites:
+    verifier("règle : %s semaine %s, %s de %s à %s est écrit en deux cours"
+             % (jour, lettre, m, a, b),
+             len(D.pour_semaine(lettre).get((jour, b), [])) > 0, True)
+
 # ------------------------------------------------- 5. aucune perte entre A et B
 # Tout cours de la semaine se compose sur au moins une des deux feuilles.
 for (jour, heure), liste in D.SEMAINE.items():

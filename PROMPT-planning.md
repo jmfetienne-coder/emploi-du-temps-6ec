@@ -58,9 +58,10 @@ géométrie de son côté : le générateur tient un registre (`POSEES`,
 `VIDES`), le harnais le suit. Deux calculs de la même géométrie seraient
 deux copies, et une copie finit par diverger.
 
-Il prend : une case hors de son créneau, un bloc de deux heures qui n'en
-couvre qu'une, un cours de la semaine B composé sur la feuille A, une
-légende qui titre une famille absente. Aucune de ces fautes ne lève
+Il prend : une case hors de son créneau, une case qui déborde sur la ligne
+suivante, un cours de la semaine B composé sur la feuille A, une légende
+qui titre une famille absente. Il épingle aussi **la règle du créneau d'une
+heure** (voir §5). Aucune de ces fautes ne lève
 d'erreur à la compilation.
 
 `verifier_app.py` relit le bloc JSON **depuis la page composée**, et non
@@ -88,6 +89,18 @@ au moins 4,5:1 sur sa couleur claire. Pour corriger une couleur trop pâle,
 on baisse la **clarté** à teinte constante : la teinte identifie la
 matière, elle n'est pas négociable. Ajouter une matière, c'est ajouter ses
 deux couleurs **et** lancer `verifier_app.py`, qui dira si elles tiennent.
+
+### Un créneau, une heure
+
+Le planning du collège fusionne les cases quand la même matière occupe deux
+heures de suite. **Ici on écrit deux cours d'une heure**, et cela vaut pour
+tout ce qu'on ajoutera : l'heure est l'unité que l'élève manipule, et
+chaque ligne de la grille porte alors son propre libellé.
+
+Le champ `duree` reste dans le modèle pour le jour où un vrai bloc
+indivisible s'imposerait — mais `verifier_planning.py` refuse qu'on s'en
+serve sans l'avoir décidé. Le contourner demande de modifier le contrôle,
+ce qui se voit.
 
 ### La typographie
 
