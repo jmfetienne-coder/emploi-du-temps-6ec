@@ -10,21 +10,33 @@ l'écran.
 | `PLANNING_SEMAINE_A.pdf` | papier | l'affiche de la semaine en cours |
 | `PLANNING_SEMAINE_B.pdf` | papier | l'affiche de la semaine en cours |
 | `PLANNING_A_ET_B.pdf` | papier | la vue d'ensemble, pour le cartable |
-| `planning_ipad.html` | écran | l'application, publiée en ligne |
+| `docs/index.html` | écran | l'application, publiée en ligne |
 
 Les trois PDF font une page, au format A4 paysage (842 × 595 pt).
+
+**L'application est en ligne ici :**
+
+> ### <https://jmfetienne-coder.github.io/emploi-du-temps-6ec/>
+
+C'est l'adresse à ouvrir sur l'iPad. Elle ne demande aucun compte.
 
 ---
 
 ## L'application
 
-Publiée à l'adresse **<https://claude.ai/artifact/DCs9k1Ggyc2cES7kP8HzeL>**.
-Elle est **privée** : elle ne s'ouvre que depuis le compte qui l'a publiée,
-ou depuis un compte à qui elle a été partagée par le menu *Share* de la page.
+**<https://jmfetienne-coder.github.io/emploi-du-temps-6ec/>**
 
-**Pour la mettre sur l'iPad** : ouvrir l'adresse dans Safari, puis
+**Pour la mettre sur l'iPad** : ouvrir cette adresse dans Safari, puis
 *Partager → Sur l'écran d'accueil*. Elle s'ouvre ensuite comme une
-application, sans barre d'adresse.
+application, sans barre d'adresse et sans qu'aucun compte soit demandé.
+Elle fonctionne **hors connexion** : elle n'appelle aucune ressource
+extérieure.
+
+La même page existe aussi comme artefact Claude, à l'adresse
+<https://claude.ai/artifact/DCs9k1Ggyc2cES7kP8HzeL>. Celle-là est
+**privée** — elle ne s'ouvre que depuis le compte qui l'a publiée — et
+c'est précisément pourquoi le site GitHub existe : une enfant n'a pas de
+compte Claude.
 
 Elle fait quatre choses que le papier ne peut pas faire.
 
@@ -50,10 +62,26 @@ dessinés tous les deux.
 
 ### Le site GitHub Pages
 
-Le même fichier, `docs/index.html`, est servi par GitHub Pages. C'est
-**exactement la page de l'artefact**, et non une copie : le harnais vérifie
-qu'elle enveloppe le même contenu, si bien que les deux adresses ne peuvent
-pas se contredire.
+| | |
+|---|---|
+| **Site** | <https://jmfetienne-coder.github.io/emploi-du-temps-6ec/> |
+| **Dépôt** | <https://github.com/jmfetienne-coder/emploi-du-temps-6ec> |
+| **Servi depuis** | `docs/`, branche `main`, par `.github/workflows/publier.yml` |
+
+Le fichier servi, `docs/index.html`, est **exactement la page de
+l'artefact** et non une copie : le harnais vérifie qu'il enveloppe le même
+contenu, si bien que les deux adresses ne peuvent pas se contredire.
+
+**Le dépôt refuse de publier une page qui ne tient pas ses promesses.** À
+chaque `push`, GitHub relance `verifier_app.py` **avant** le déploiement :
+il réengendre la page, la compare à celle du dépôt, relit les données
+contre `donnees_planning.py` et mesure le contraste des quatorze matières.
+Une retouche à la main dans le HTML, ou un emploi du temps corrigé sans
+réengendrer, casse la construction et n'atteint jamais l'iPad.
+
+Le harnais des PDF n'est pas dans cette chaîne : il demande lualatex et
+PyMuPDF, et les affiches ne sont pas ce que ce site sert. Il reste à lancer
+à la main avant de valider.
 
 Ce qui **n'est pas** publié, et pourquoi :
 
@@ -145,20 +173,26 @@ PLANNING/
 ├── donnees_planning.py              LA SOURCE UNIQUE : matières, couleurs, créneaux, cours
 ├── generer_planning.py              engendre les trois .tex et les compile
 ├── verifier_planning.py             ouvre les PDF et vérifie ce qui y est composé
-├── generer_app.py                   engendre la page de l'iPad et son aperçu local
+├── generer_app.py                   engendre la page de l'iPad, dans ses deux formes
 ├── verifier_app.py                  vérifie les données, la palette et les contrastes
-├── planning_ipad.html               l'application, au format attendu par l'hébergeur
+├── planning_ipad.html               l'application, au format attendu par l'artefact
 ├── docs/index.html                  la MÊME page, autonome : le site GitHub Pages
+├── .github/workflows/publier.yml    contrôle la page, puis la publie sur Pages
 ├── PLANNING_SEMAINE_A.pdf / .tex
 ├── PLANNING_SEMAINE_B.pdf / .tex
 └── PLANNING_A_ET_B.pdf  / .tex
 ```
 
-Pour tout refaire après une correction :
+Pour tout refaire après une correction, et la mettre en ligne :
 
 ```bash
-python3 generer_planning.py && python3 verifier_planning.py && python3 generer_app.py && python3 verifier_app.py
+python3 generer_planning.py && python3 verifier_planning.py && python3 generer_app.py && python3 verifier_app.py && git commit -am "mise à jour de l'emploi du temps" && git push
 ```
+
+Les trois affiches, l'artefact Claude et le site GitHub se remettent à jour
+ensemble : ils lisent le même fichier, et 710 contrôles interdisent qu'ils
+divergent. Le `push` déclenche la publication, qui relance les contrôles de
+la page avant de déployer.
 
 Pour regarder l'application sur cette machine :
 
