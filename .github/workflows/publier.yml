@@ -1,10 +1,8 @@
 # Publie docs/ sur GitHub Pages — et ne le publie QUE si les contrôles passent.
 #
-# Deux raisons d'avoir ce fichier plutôt que de cocher Pages à la main :
+# La raison d'avoir ce fichier plutôt que de servir docs/ directement :
 #
-# 1. `configure-pages` avec `enablement: true` active Pages tout seul, avec le
-#    jeton du dépôt. Personne n'a à donner d'accès à personne.
-# 2. Surtout : `verifier_app.py` tourne AVANT le déploiement. Il réengendre la
+# 1. `verifier_app.py` tourne AVANT le déploiement. Il réengendre la
 #    page et la compare à celle du dépôt, relit les données contre
 #    donnees_planning.py, et mesure le contraste des quatorze matières. Un
 #    fichier retouché à la main, ou un emploi du temps corrigé sans
@@ -50,9 +48,13 @@ jobs:
       url: ${{ steps.deploiement.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      # Sans `enablement: true` : activer Pages la première fois demande les
+      # droits d'administration du dépôt, que le jeton de l'action ne porte
+      # pas — la construction échouait sur « Must have admin rights to
+      # Repository ». La source est désormais réglée sur GitHub Actions dans
+      # les paramètres, une fois pour toutes, et l'action n'a plus qu'à lire
+      # cette configuration.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
