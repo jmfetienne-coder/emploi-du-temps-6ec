@@ -32,6 +32,25 @@ application, sans barre d'adresse et sans qu'aucun compte soit demandé.
 Elle fonctionne **hors connexion** : elle n'appelle aucune ressource
 extérieure.
 
+### Elle se met à jour toute seule
+
+**L'adresse ne change jamais.** L'icône posée sur l'écran d'accueil pointe
+vers elle, et chaque `push` sur le dépôt change ce qu'elle affiche — il n'y
+a rien à refaire sur l'iPad, ni à réinstaller, ni à repartager.
+
+Trois choses à savoir quand même :
+
+- **GitHub met un cache de dix minutes** (`max-age=600`). Dans ce délai,
+  l'iPad peut encore montrer la version d'avant. Pour forcer : tirer la
+  page vers le bas, ou fermer complètement l'application et la rouvrir.
+- **Ne pas passer par *Réglages → Safari → Effacer historique et données*.**
+  Cela marcherait, mais effacerait du même coup les réglages de Chloé — la
+  semaine A ou B, et son groupe. Il faudrait les ressaisir.
+- **Régler la semaine et le groupe après avoir ajouté l'icône**, et non
+  avant : iOS donne à une page ajoutée à l'écran d'accueil son propre
+  espace de stockage, séparé de celui de Safari. Ce qui a été réglé dans
+  Safari ne suit pas.
+
 La même page existe aussi comme artefact Claude, à l'adresse
 <https://claude.ai/artifact/DCs9k1Ggyc2cES7kP8HzeL>. Celle-là est
 **privée** — elle ne s'ouvre que depuis le compte qui l'a publiée — et
